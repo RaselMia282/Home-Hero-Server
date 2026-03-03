@@ -36,10 +36,15 @@ const reviews = database.collection("reviews");
 
 app.get('/services',async(req,res)=>{
   const email = req.query.email;
+  const category = req.query.category;
   let query ={};
   if(email){
     query={email:email};
+
+  }else if(category){
+query={ category: { $regex: category, $options: "i" } }; 
   }
+  
 const cursor = servicesCollection.find(query);
 const result = await cursor.toArray();
 res.send(result);
