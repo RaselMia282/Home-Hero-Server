@@ -35,7 +35,12 @@ const reviews = database.collection("reviews");
 // services api here;
 
 app.get('/services',async(req,res)=>{
-const cursor = servicesCollection.find();
+  const email = req.query.email;
+  let query ={};
+  if(email){
+    query={email:email};
+  }
+const cursor = servicesCollection.find(query);
 const result = await cursor.toArray();
 res.send(result);
 })
@@ -63,7 +68,7 @@ app.patch('/services/:id',async(req,res)=>{
   const query = {_id:new ObjectId(id)};
   const update={
     $set:{
-      updatedService,
+      ...updatedService
     }
   }
   const result = await servicesCollection.updateOne(query,update);
