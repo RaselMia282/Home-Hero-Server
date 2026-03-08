@@ -31,24 +31,25 @@ const database = client.db("HomeHeroDB");
 const servicesCollection = database.collection("services");
 const usersCollection = database.collection("users");
 const reviews = database.collection("reviews");
-
+const bookings = database.collection("bookings")
 // services api here;
 
-app.get('/services',async(req,res)=>{
+app.get('/services', async (req, res) => {
   const email = req.query.email;
   const category = req.query.category;
-  let query ={};
-  if(email){
-    query={email:email};
+  let query = {};
 
-  }else if(category){
-query={ category: { $regex: category, $options: "i" } }; 
+  if (email) {
+    query = { email: email };
+  } 
+  else if (category) {
+    query = { category: category };
   }
-  
-const cursor = servicesCollection.find(query);
-const result = await cursor.toArray();
-res.send(result);
-})
+
+  const cursor = servicesCollection.find(query);
+  const result = await cursor.toArray();
+  res.send(result);
+});
 
 // to get specific service api here,
 app.get('/services/:id',async(req,res)=>{
@@ -80,9 +81,32 @@ app.patch('/services/:id',async(req,res)=>{
   res.send(result);
 })
 
-
-
-
+// bookings related api here,
+// booking get api
+app.get('/bookings',async(req,res)=>{
+  const email = req.query.email;
+  let query = {};
+  if (email) {
+    query = { customerEmail: email };
+  } 
+  const cursor = bookings.find(query);
+  const result = await cursor.toArray();
+  res.send(result);
+})
+// bookings post api
+app.post('/bookings', async (req, res) => {
+  const bookingData = req.body;
+  console.log("New Booking coming in:", bookingData);
+  const result = await bookings.insertOne(bookingData);
+  res.send(result);
+});
+// bookings delete api
+app.delete('/bookings/:id',async(req,res)=>{
+  const id = req.params.id;
+  const query ={_id: new ObjectId(id)};
+  const result = await bookings.deleteOne(query);
+  res.send(result);
+})
 
 
 
@@ -96,6 +120,6 @@ app.patch('/services/:id',async(req,res)=>{
 run().catch(console.dir);
 
 app.listen(port,()=>{
-    console.log(`user server started on port ${3000}`);
+    console.log(`user server started on port ${port}`);
     
 })
